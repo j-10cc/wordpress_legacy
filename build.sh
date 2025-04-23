@@ -9,6 +9,8 @@ php generate.php
 # render all page
 for i in {0..9}; do
     if [ -f "articles_page${i}.txt" ]; then
+        sed -i 's/&hellip;/.../g' articles_page${i}.txt
+
         page=index.html
         [ $i -gt 0 ] && page="index$((i+1)).html"
 

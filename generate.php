@@ -51,12 +51,13 @@ for ($page = 0; $page < $total_pages; $page++) {
             echo "<img src=\"images/$gif_name\" width=\"300\" alt=\"Í¼Ïñ\"><br>\n";
         }
         echo "$summary<br><br>\n";
-
+       
         $content = $post->post_content;
 
         $content = preg_replace('/(<br[^>]*>)/i', '<br>', $content); 
         $content = preg_replace('/(<br>\s*){2,}/', '<br>', $content);  
         $content = preg_replace('/\s+/', ' ', $content);
+        
 
         // remove all <iframe> <video> <audio> <script> <style> tags
         $content = preg_replace([
