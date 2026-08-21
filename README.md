@@ -26,6 +26,7 @@ wordpress_legacy/
 ├── generate.php       主程序：读取 WordPress、转换内容并生成静态站点
 ├── build.sh           Shell 启动脚本，将参数转交给 generate.php
 ├── .gitattributes     固定 PHP、Shell 和 HTML 文件的 LF 换行符
+├── LICENSE            GNU GPL v2.0 许可证正文
 ├── template.html      内置的 GBK 首页模板，可按需修改
 └── legacy/            默认输出目录，首次运行时自动创建
     ├── index.html     第一页文章列表
@@ -146,3 +147,7 @@ IMAGEMAGICK_CONVERT=/usr/bin/magick ./build.sh --wordpress-root=/var/www/html
 - 每次运行都会覆盖对应的生成页面，并清理输出目录中已失效的生成文件。不要把手工维护且符合 `post_ID.html`、`indexN.html` 或程序图片命名规则的文件放进输出目录。
 - 若 PHP 禁用了 `exec()`，图片转换会失败，但文字页面仍会继续生成，并在结束时报告图片警告数量。
 - 建议先在测试目录导出并检查结果，再将输出目录发布到正式站点。
+
+## 开源许可证
+
+本项目采用 [GNU General Public License v2.0](LICENSE)（GPL-2.0-only）发布。
