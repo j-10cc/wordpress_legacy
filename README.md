@@ -22,16 +22,14 @@
 
 ## 配色、语言与编码
 
-不传 `--config` 时继续使用蓝色配色、中文导航和 GB2312 Early 页面。配置只在导出时读取，不增加客户端脚本、CSS 变量或网络请求；浏览页面也不需要读取配置文件。
-
-复制 [legacy.example.json](legacy.example.json) 后编辑：
+默认使用蓝色配色、中文导航和 GB2312 Early 页面。复制 [legacy.example.json](legacy.example.json) 后编辑，未提供的项保留默认值：
 
 ```bash
 cp legacy.example.json legacy.json
 ./build.sh --wordpress-root=/var/www/html --output=/var/www/html/legacy --config=legacy.json
 ```
 
-示例采用英文导航和 Windows-1252 编码，并列出全部颜色键；不需要覆盖的颜色可以删去。实际配置可以很短，未提供的项继承默认值：
+配置示例：
 
 ```json
 {
@@ -51,31 +49,17 @@ cp legacy.example.json legacy.json
 }
 ```
 
-颜色值仅接受 `#RGB`、`#RRGGBB`。常用颜色为 `primary`（页头及 Early 站名）、`on_primary`（主色背景上的文字）、`background`（页面外背景）、`surface`（内容背景）、`text`、`muted`、`link`、`visited`、`border`、`code_background`、`table_header_background`。边栏、文章标题链接及 Touch 菜单的细分颜色也可独立设置，完整名称和默认值见示例的 `theme`。未指定的细分颜色保持默认，不自动推算整套色板。
-
-Early 的链接颜色由 `early_link` 控制，已访问链接由 `early_visited` 控制；不显式提供时，前者跟随已配置的 `link`，其次跟随已配置的 `primary`，后者跟随已配置的 `visited`。完全不提供配置时保留原先蓝色链接和灰色已访问链接。其他三版只有显式提供 `visited` 时才统一覆盖已访问链接颜色，否则保留各组件原有颜色。其他三版使用 CSS，Early 写入传统 `bgcolor/text/link/vlink` 和 `font color` 属性。配置不会修改文章图片的颜色。
-
-`language` 与 `early_charset` 独立：切换编码不会翻译文字。内置 `zh-CN`、`en` 导航；其他合法语言标签使用英文兜底，再通过 `messages` 覆盖文案，HTML 的 `lang` 随语言标签输出。文章标题、正文、摘要、站名和简介保持 WordPress 原文，不自动翻译。
-
-`messages` 支持如下键，所有值为纯文本，输出时转义，不能注入 HTML：
-
-| 键 | 用途 / 必须保留的占位符 |
+| 参数 | 说明 |
 |---|---|
-| `notice`, `main_site`, `home` | 旧浏览器说明、返回主站、首页 |
-| `previous_post`, `next_post` | 上一篇、下一篇 |
-| `previous_page`, `next_page`, `page_status` | 上一页、下一页、分页状态；状态保留 `{page}` 和 `{pages}`，可调整顺序 |
-| `empty` | 无文章时的提示 |
-| `index`, `index_label`, `open`, `close` | Touch 索引按钮、标题及辅助提示 |
-| `browse_all`, `recent_posts`, `recent_updates`, `by_year` | 浏览全部、近期文章、最近更新、按年浏览 |
-| `year_label`, `post_count` | 年份和文章数；分别保留 `{year}`、`{count}` |
+| `theme` | 配色，接受 `#RGB` 或 `#RRGGBB`。示例中的 `primary`、`background`、`surface`、`text` 分别为主色、页面背景、内容背景和正文色；完整颜色键见配置文件示例。 |
+| `language` | 导航语言，内置 `zh-CN`（默认）和 `en`；其他语言使用英文兜底，可配合 `messages` 自定义。不会翻译文章内容。 |
+| `messages` | 覆盖导航文案，如 `notice`（站点说明）、`home`（首页）、`page_status`（分页状态）。使用纯文本，保留原有占位符：分页为 `{page}`、`{pages}`，年份为 `{year}`，文章数为 `{count}`。 |
+| `early_charset` | Early 页面编码，默认 `GB2312`；其他三版固定为 UTF-8。与导航语言独立设置。 |
+| `unmappable` | 无法用目标编码表示的字符：`entity`（默认）保留为数字字符引用并提示；`error` 停止导出并报错。 |
 
-Early 编码支持 `GB2312`、`GBK`、`GB18030`、`Big5`、`Shift_JIS`、`EUC-JP`、`EUC-KR`、`windows-1252`、`windows-1251`、`ISO-8859-1`、`KOI8-R`、`UTF-8`，名称不区分大小写，并检查当前 PHP 的 iconv 支持。选用客户端实际支持的编码；UTF-8 可导出并不意味着所有古董浏览器都能显示。
+可选编码：`GB2312`、`GBK`、`GB18030`、`Big5`、`Shift_JIS`、`EUC-JP`、`EUC-KR`、`windows-1252`、`windows-1251`、`ISO-8859-1`、`KOI8-R`、`UTF-8`。请按目标浏览器选择。
 
-`unmappable` 默认 `entity`：无法用目标编码表示的字符改写为十进制字符引用，如 `&#128512;`，按文件报告数量，不静默删除。浏览器还需要支持相应字符引用和字体才能正确显示。设为 `error` 则遇到不可表示字符时停止导出；失败的输出目录不应部署。GB2312 的破折号保留历史兼容映射。
-
-无效 JSON、未知配置项、不合法颜色、语言标签、编码或文案占位符会在加载 WordPress、清理 `editions/` 之前报错。**修改任意配置后，都要重新导出并完整部署 HTML、样式及 `dispatch.php`**；只替换 JSON 不会改变已生成站点，单独部署旧分流器还可能造成响应头与字节编码不一致。
-
-当前范围为已发布的 `post` 文章：不导出独立页面、自定义文章类型、评论或插件交互功能，也不承诺任意插件短代码的完整还原。
+修改配置后，需重新导出并完整部署输出目录。
 
 ## 四套页面
 
