@@ -1,0 +1,40 @@
+body { margin:0; background:#eff3ff; color:#333; font:16px/1.7 Arial,"Microsoft YaHei",sans-serif; }
+.page { margin:0 auto; background:#fff; word-wrap:break-word; }
+.page img { max-width:100%; height:auto; }
+a { color:#333; }
+.mast { background:#006699; color:white; font:bold 16px/2.6 Georgia,serif; padding:0 14px; }
+h1 { font: bold 36px/1.15 Georgia,serif; margin:12px 0 22px; }
+h2 { margin:36px 0 12px; border-top:2px solid #eaeaea; padding-top:12px; }
+h3 { color:#333; margin:22px 0 10px; }
+.video { padding:12px; background:#f7f7f7; margin:14px 0; overflow:hidden; }
+.video-frame { width:100%; overflow:hidden; }
+.video iframe { display:block; width:100%; max-width:100%; border:0; margin:0; }
+.scroll { overflow:auto; width:100%; margin:16px 0; }
+table { width:100%; border-collapse:collapse; font-size:95%; }
+th,td { text-align:left; vertical-align:top; padding:7px; border:1px solid #ccc; }
+th { color:#333; background:#f1f1f1; }
+.code { background:#f7f7f7; color:#333; }
+pre { margin:0; padding:12px; font:14px/1.6 "Courier New",monospace; }
+.picture { text-align:center; color:#707070; font-size:14px; padding:8px 0; }
+.picture img { max-width:100%; height:auto; vertical-align:middle; }
+.classic .page { width:auto; max-width:700px; padding:16px 22px 35px; border-left:1px solid #eaeaea; border-right:1px solid #eaeaea; }
+.classic .gallery { table-layout:fixed; }
+.classic .gallery td { width:50%; border:0; padding:4px; }
+.classic .gallery img { width:100%; height:auto; }
+.touch .page { max-width:44em; padding:0 4% 2em; }
+.touch .mast { margin:0 -4%; }
+.touch .scroll { -webkit-overflow-scrolling:touch; }
+.touch .video a { display:inline-block; padding:6px 0; }
+.pocket { font:small/1.4 Tahoma,sans-serif; }
+.pocket .page { padding:3px; word-wrap:break-word; }
+.pocket h1 { font:bold 1.5em Tahoma,sans-serif; }
+.pocket h2 { font-size:1.2em; margin-top:16px; }
+.pocket .code,.pocket .video { padding:4px; margin:6px 0; }
+.pocket table,.pocket th,.pocket td { font-size:small; line-height:1.4; }
+.pocket table { table-layout:fixed; }
+.pocket .scroll { width:auto; overflow:visible; }
+.pocket th,.pocket td { padding:3px; word-wrap:break-word; word-break:break-all; }
+.pocket .code { font:small/1.3 monospace; width:auto; overflow:hidden; white-space:normal; word-break:break-all; }
+.pocket .code code { display:block; padding:0; border:0; font-kerning:none; font-variant-ligatures:none; }
+.pocket .code code.code-measured { white-space:nowrap; word-wrap:normal; word-break:normal; }
+.pocket td .code,.pocket th .code { width:auto; padding:0; }

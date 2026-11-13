@@ -1,0 +1,11 @@
+/* Keep the original Pocket body/code fonts. Only table fallback breaks need CSS toggles. */
+.ie-wrap { display:none; }
+.pocket-ie .ie-wrap { display:inline; }
+.pocket-ie .picture { font-size:11px; line-height:1.4; }
+.pocket-ie .code,.pocket-ie code { white-space:normal; }
+.pocket-ie .code { padding:2px; margin:6px 0; }
+.pocket-ie table { width:100%; table-layout:fixed; font-size:small; margin:6px 0; }
+.pocket-ie th,.pocket-ie td { font-size:small; padding:2px; white-space:normal; }
+.pocket-ie td p,.pocket-ie th p { margin:3px 0; }
+.pocket-ie td ul,.pocket-ie td ol,.pocket-ie th ul,.pocket-ie th ol { margin:0; padding-left:12px; }
+.pocket-ie .scroll { overflow:visible; width:auto; margin:6px 0; }
