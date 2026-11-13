@@ -1,4 +1,4 @@
-/* Explicit pixel widths for browsers with unreliable percentage iframe/image sizing. */
+/* Explicit pixel widths for browsers with unreliable percentage image sizing. */
 (function () {
     if (!document.getElementsByTagName) { return; }
     var items = [], timer = null, i, nodes, node;
@@ -54,11 +54,6 @@
     function schedule() {
         if (timer !== null) { window.clearTimeout(timer); }
         timer = window.setTimeout(function () { timer = null; fit(); }, 150);
-    }
-    nodes = document.getElementsByTagName('iframe');
-    for (i = 0; i < nodes.length; i++) {
-        node = nodes[i];
-        if (node.parentNode.className === 'video-frame') { items[items.length] = {node:node,parent:node.parentNode}; }
     }
     nodes = document.getElementsByTagName('img');
     for (i = 0; i < nodes.length; i++) {

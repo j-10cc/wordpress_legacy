@@ -1,9 +1,5 @@
 <?php
 
-function export_is_bilibili_link($href) {
-    return preg_match('~(^|\.)bilibili\.com$|^b23\.tv$~i', (string) parse_url($href, PHP_URL_HOST));
-}
-
 function export_prepare_links($root, $xpath, $permalink, $targets, $media) {
     foreach ($xpath->query('.//a[@href]', $root) as $a) {
         $href = $a->getAttribute('href');
@@ -80,29 +76,15 @@ function export_publish_site($posts, $out, $per_page) {
             }
         }
         export_prepare_links($root, $xpath, get_permalink($post), $targets, $media);
-        foreach ($xpath->query('.//iframe', $root) as $frame) {
-            $poster = 'about:blank';
-            if (isset($cover['touch_list'])) {
-                $image = basename($cover['touch_list']['src']);
-                $name = substr($image, 0, -4) . '-poster.html';
-                $path = "$out/images/$name";
-                if (!isset($generated[legacy_path_key($path)])) {
-                    export_write($path, export_video_poster($image));
-                    legacy_track_generated($path, $generated);
-                }
-                $poster = 'images/' . $name;
-            }
-            $frame->setAttribute('data-export-poster', $poster);
-        }
         $summary = trim($post->post_excerpt);
         if ($summary === '') { $summary = $xpath->evaluate('string((.//p[normalize-space() and not(a and not(normalize-space(text())))])[1])', $root); }
         if ($summary === '') { $summary = $xpath->evaluate('string(.//iframe/@title)', $root); }
         if ($summary === '') { $summary = wp_strip_all_tags($source); }
         $summary = trim(preg_replace('/\s+/u', ' ', html_entity_decode(wp_strip_all_tags($summary), ENT_QUOTES, 'UTF-8')));
         $links = array();
-        if ($i + 1 < $count) { $links[] = export_post_link($posts[$i + 1], '上一篇 '); }
-        if ($i > 0) { $links[] = export_post_link($posts[$i - 1], '下一篇 '); }
-        $links[] = '<a href="index.html">首页</a>';
+        if ($i + 1 < $count) { $links[] = export_post_link($posts[$i + 1], export_text('previous_post') . ' '); }
+        if ($i > 0) { $links[] = export_post_link($posts[$i - 1], export_text('next_post') . ' '); }
+        $links[] = '<a href="index.html">' . export_text('home') . '</a>';
         foreach ($profiles as $profile) {
             $entries[$profile][] = export_entry($post, $profile, $cover, $summary);
             $hero = export_picture($cover, $profile, $post->post_title, 700);
@@ -114,9 +96,9 @@ function export_publish_site($posts, $out, $per_page) {
             if ($profile === 'early') {
                 $heading = export_early_label(html_entity_decode($post->post_title, ENT_QUOTES, 'UTF-8'), 28);
                 $post_links = array();
-                if ($i + 1 < $count) { $post_links[] = export_post_link($posts[$i + 1], '上一篇 ', 48); }
-                if ($i > 0) { $post_links[] = export_post_link($posts[$i - 1], '下一篇 ', 48); }
-                $post_links[] = '<a href="index.html">首页</a>';
+                if ($i + 1 < $count) { $post_links[] = export_post_link($posts[$i + 1], export_text('previous_post') . ' ', 48); }
+                if ($i > 0) { $post_links[] = export_post_link($posts[$i - 1], export_text('next_post') . ' ', 48); }
+                $post_links[] = '<a href="index.html">' . export_text('home') . '</a>';
             }
             $heading_tag = $profile === 'early' ? 'h2' : 'h1';
             $body = export_mast($profile, $site, false, $profile === 'touch' ? $touch_index : $sidebar) . '<' . $heading_tag . '>' . $heading . '</' . $heading_tag . '>' . $hero . $content . '<hr><p>' . implode('<br>', $post_links) . '</p>';
@@ -127,13 +109,13 @@ function export_publish_site($posts, $out, $per_page) {
     $pages = max(1, (int)ceil($count / $per_page));
     for ($n = 0; $n < $pages; $n++) {
         $links = array();
-        if ($n) { $links[] = '<a href="' . legacy_index_filename($n - 1) . '">上一页</a>'; }
-        $links[] = '第 ' . ($n + 1) . ' / ' . $pages . ' 页';
-        if ($n + 1 < $pages) { $links[] = '<a href="' . legacy_index_filename($n + 1) . '">下一页</a>'; }
+        if ($n) { $links[] = '<a href="' . legacy_index_filename($n - 1) . '">' . export_text('previous_page') . '</a>'; }
+        $links[] = export_text('page_status', array('page'=>$n + 1, 'pages'=>$pages));
+        if ($n + 1 < $pages) { $links[] = '<a href="' . legacy_index_filename($n + 1) . '">' . export_text('next_page') . '</a>'; }
         $nav = implode(' &nbsp; ', $links);
         foreach ($profiles as $profile) {
             $items = implode("\n", array_slice($entries[$profile], $n * $per_page, $per_page));
-            if (!$count) { $items = '<p>暂无文章。</p>'; }
+            if (!$count) { $items = '<p>' . export_text('empty') . '</p>'; }
             $pagination = $profile === 'early' ? '<p align="center">' . $nav . '</p>'
                 : '<div class="pagination" align="center">' . $nav . '</div>';
             $listing = $items . $pagination;
@@ -154,13 +136,14 @@ function export_publish_site($posts, $out, $per_page) {
     $pocket_css = file_get_contents(__DIR__ . '/pocket-ie.css');
     $touch_css = file_get_contents(__DIR__ . '/touch-menu.css');
     foreach (array('list.css','reader.css') as $css) {
-        export_write("$out/styles/$css", file_get_contents(__DIR__ . "/$css") . "\n" . $pocket_css . "\n" . $touch_css);
+        export_write("$out/styles/$css", export_theme_css(file_get_contents(__DIR__ . "/$css") . "\n" . $pocket_css . "\n" . $touch_css));
     }
     if (is_file("$out/styles/pocket-ie.css") && !unlink("$out/styles/pocket-ie.css")) {
         throw new RuntimeException('Cannot remove obsolete Pocket stylesheet');
     }
     export_write("$out/ua-rules.json", file_get_contents(__DIR__ . '/ua-rules.json'));
-    export_write("$out/dispatch.php", file_get_contents(__DIR__ . '/dispatch.php'));
+    $dispatch = str_replace("define('LEGACY_EARLY_CHARSET', 'GB2312');", "define('LEGACY_EARLY_CHARSET', " . var_export(export_charset(), true) . ");", file_get_contents(__DIR__ . '/dispatch.php'));
+    export_write("$out/dispatch.php", $dispatch);
     $config = "$out/.htaccess";
     $rules = file_get_contents(__DIR__ . '/apache.conf');
     $existing = is_file($config) ? file_get_contents($config) : '';

@@ -1,33 +1,34 @@
 .touch .mast { overflow:hidden; }
 .touch .mast h1,.touch .mast-title { display:block; margin-right:76px; word-wrap:break-word; }
-.touch .mast .touch-menu-toggle { float:right; display:block; padding:0 6px; min-height:44px; line-height:44px; font:normal 14px/44px Arial,sans-serif; color:#fff; text-decoration:none; }
+.touch .mast .touch-menu-toggle { float:right; display:block; padding:0 6px; min-height:44px; line-height:44px; font:normal 14px/44px Arial,sans-serif; color:{{on_primary}}; text-decoration:none; }
 .touch .menu-icon { display:inline-block; vertical-align:middle; width:18px; margin-right:6px; }
-.touch .menu-icon span { display:block; height:2px; margin:3px 0; background:#fff; }
+.touch .menu-icon span { display:block; height:2px; margin:3px 0; background:{{on_primary}}; }
 /* Without script this remains an ordinary, usable navigation section. */
-.touch .touch-menu { margin:0 0 12px auto; max-width:340px; background:#eff3ff; color:#333; font:16px/1.5 Arial,sans-serif; word-wrap:break-word; }
-.touch .touch-menu-head { overflow:hidden; padding:12px 16px; background:#006699; color:#fff; }
-.touch .touch-menu-head h2 { margin:0 48px 0 0; padding:0; border:0; font:bold 20px/44px Arial,sans-serif; color:#fff; }
-.touch .touch-menu-close { display:none; float:right; width:44px; height:44px; padding:0; border:0; background:#005480; color:#fff; font:normal 30px/44px Arial,sans-serif; cursor:pointer; }
+.touch .touch-menu { margin:0 0 12px auto; max-width:340px; background:{{background}}; color:{{text}}; font:16px/1.5 Arial,sans-serif; word-wrap:break-word; }
+.touch .touch-menu-head { overflow:hidden; padding:12px 16px; background:{{primary}}; color:{{on_primary}}; }
+.touch .touch-menu-head h2 { margin:0 48px 0 0; padding:0; border:0; font:bold 20px/44px Arial,sans-serif; color:{{on_primary}}; }
+.touch .touch-menu-close { display:none; float:right; width:44px; height:44px; padding:0; border:0; background:{{menu_button}}; color:{{on_primary}}; font:normal 30px/44px Arial,sans-serif; cursor:pointer; }
 .touch .touch-menu-content { padding:16px; }
-.touch .touch-menu h3 { margin:24px 0 10px; padding:0; border:0; color:#496879; font:bold 14px/1.5 Arial,sans-serif; }
-.touch .touch-menu a { color:#174a65; text-decoration:none; }
-.touch .touch-home { display:block; padding:14px 16px; background:#006699; color:#fff !important; font-weight:bold; }
-.touch .touch-home span { display:block; margin-top:2px; font-size:13px; font-weight:normal; color:#e2f1f8; }
+.touch .touch-menu h3 { margin:24px 0 10px; padding:0; border:0; color:{{menu_heading}}; font:bold 14px/1.5 Arial,sans-serif; }
+.touch .touch-menu a { color:{{menu_link}}; text-decoration:none; }
+.touch .touch-home { display:block; padding:14px 16px; background:{{primary}}; color:{{on_primary}} !important; font-weight:bold; }
+.touch .touch-home span { display:block; margin-top:2px; font-size:13px; font-weight:normal; color:{{menu_subtitle}}; }
 .touch .touch-menu ul { margin:0; padding:0; list-style:none; }
-.touch .touch-recent { background:#fff; }
-.touch .touch-recent li { margin:0; padding:0; border-bottom:1px solid #e4eaf0; }
+.touch .touch-recent { background:{{surface}}; }
+.touch .touch-recent li { margin:0; padding:0; border-bottom:1px solid {{menu_border}}; }
 .touch .touch-recent a { display:block; padding:13px 14px; }
 .touch .touch-recent-title { display:block; font-size:16px; line-height:1.5; }
-.touch .touch-recent-date { display:block; margin-top:5px; color:#6b7d88; font-size:12px; }
+.touch .touch-recent-date { display:block; margin-top:5px; color:{{menu_muted}}; font-size:12px; }
 .touch .touch-years li { display:inline-block; width:48%; margin:0 2% 10px 0; padding:0; vertical-align:top; }
-.touch .touch-years a { display:block; padding:12px 10px; background:#fff; font-size:18px; }
-.touch .touch-years span { display:block; color:#6b7d88; font-size:12px; }
-.touch .touch-menu a:active { background:#dcebf5; }
-.touch .touch-menu-toggle:focus,.touch .touch-menu a:focus,.touch .touch-menu-close:focus { outline:2px solid #d39c36; }
+.touch .touch-years a { display:block; padding:12px 10px; background:{{surface}}; font-size:18px; }
+.touch .touch-years span { display:block; color:{{menu_muted}}; font-size:12px; }
+.touch .touch-menu a:active { background:{{menu_active}}; }
+.touch .touch-menu-toggle:focus,.touch .touch-menu a:focus,.touch .touch-menu-close:focus { outline:2px solid {{focus}}; }
 .touch .touch-menu-shade { display:none; }
 /* No animation, transparency, shadow or document-wide scroll/style changes. */
 .touch .touch-menu-ready { position:fixed; top:0; right:0; bottom:0; left:0; z-index:10000; overflow:hidden; }
 .touch .touch-menu-absolute { position:absolute; bottom:auto; }
-.touch .touch-menu-ready .touch-menu-shade { display:block; position:absolute; top:0; left:0; width:100%; height:100%; background:#50616c; }
+.touch .touch-menu-ready .touch-menu-shade { display:block; position:absolute; top:0; left:0; width:100%; height:100%; background:{{overlay}}; }
 .touch .touch-menu-ready .touch-menu { position:absolute; top:0; right:0; width:84%; height:100%; max-width:320px; margin:0; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
 .touch .touch-menu-toggle,.touch .touch-menu-close { touch-action:manipulation; }
+.touch .touch-menu a:visited { color:{{visited}}; }

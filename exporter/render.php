@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/pocket-ie.php';
+require_once __DIR__ . '/config.php';
 
 function export_write($path, $bytes) {
     if ($bytes === false) { throw new RuntimeException("Missing source data for $path"); }
@@ -90,30 +91,6 @@ function export_picture($images, $edition, $caption, $limit, $linked = false) {
     return $img;
 }
 
-function export_video_poster($image) {
-    return '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><title>Video</title></head>'
-        . '<body style="margin:0;text-align:center;background:#eff3ff;overflow:hidden">'
-        . '<img style="display:block;width:100%;max-width:480px;height:auto;margin:0 auto" src="' . legacy_escape($image) . '" alt=""></body></html>';
-}
-
-function export_video($node, $edition) {
-    if (!in_array($edition, array('classic','touch'), true)) { return ''; }
-    $src = $node->getAttribute('src');
-    if (strpos($src, '//') === 0) { $src = 'https:' . $src; }
-    $url = parse_url($src);
-    if (!isset($url['host'], $url['query']) || strtolower($url['host']) !== 'player.bilibili.com') { return ''; }
-    parse_str($url['query'], $query);
-    if (empty($query['bvid']) || !is_string($query['bvid']) || !preg_match('/^BV[0-9A-Za-z]+$/D', $query['bvid'])) { return ''; }
-    $bv = $query['bvid'];
-    $query['autoplay'] = '0';
-    $player = 'https://player.bilibili.com/player.html?' . legacy_escape(http_build_query($query));
-    $target = 'player-' . $node->getLineNo() . '-' . $bv;
-    $poster = legacy_escape($node->getAttribute('data-export-poster'));
-    return '<div class="video"><a href="' . $player . '" target="' . $target . '">载入网页播放器</a>'
-        . '<div class="video-frame"><iframe title="视频演示" name="' . $target . '" src="' . $poster . '" width="100%" height="240" frameborder="0" scrolling="no"></iframe></div>'
-        . '<a href="https://www.bilibili.com/video/' . $bv . '/">在哔哩哔哩观看</a> · ' . $bv . '</div>';
-}
-
 function export_children($parent, $edition, &$media) {
     $html = '';
     foreach ($parent->childNodes as $node) { $html .= export_node($node, $edition, $media); }
@@ -124,11 +101,7 @@ function export_node($node, $edition, &$media) {
     if ($node->nodeType === XML_TEXT_NODE) { return legacy_escape($node->nodeValue); }
     if ($node->nodeType !== XML_ELEMENT_NODE) { return ''; }
     $tag = strtolower($node->nodeName);
-    if (in_array($tag, array('script','style','object','embed','form','textarea','button','input','svg','video','audio','select'), true)) { return ''; }
-    if ($tag === 'iframe') { return export_video($node, $edition); }
-    if ($tag === 'a' && $edition === 'pocket' && export_is_bilibili_link($node->getAttribute('href'))) {
-        return export_children($node, $edition, $media);
-    }
+    if (in_array($tag, array('script','style','object','embed','form','textarea','button','input','svg','iframe','video','audio','select'), true)) { return ''; }
     if ($tag === 'img') {
         $src = $node->getAttribute('src');
         $width = $edition === 'pocket' ? 192 : 700;
@@ -186,16 +159,16 @@ function export_page($edition, $title, $body, $stylesheet) {
         if ($wrap_script === null) { $wrap_script = file_get_contents(__DIR__ . '/pocket-code.js'); }
         $script = '<script type="text/javascript">' . $wrap_script . '</script>';
     }
-    if (in_array($edition, array('classic','pocket','touch'), true) && (strpos($body, '<img ') !== false || strpos($body, '<iframe ') !== false)) {
+    if (in_array($edition, array('classic','pocket','touch'), true) && strpos($body, '<img ') !== false) {
         static $media_script = null;
         if ($media_script === null) { $media_script = file_get_contents(__DIR__ . '/fit-media.js'); }
         $script .= '<script type="text/javascript">' . $media_script . '</script>';
     }
     if ($edition === 'early') {
         $head = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">';
-        $meta = '<meta http-equiv="Content-Type" content="text/html; charset=GB2312">';
+        $meta = '<meta http-equiv="Content-Type" content="text/html; charset=' . export_charset() . '">';
         // Plain flow lets early browsers paint paragraphs without laying out one giant table.
-        $body = '<body bgcolor="#ffffff" text="#333333" link="#006699" vlink="#707070">' . $body;
+        $body = '<body bgcolor="' . export_color('surface') . '" text="' . export_color('text') . '" link="' . export_color('early_link') . '" vlink="' . export_color('early_visited') . '">' . $body;
     } else {
         $head = '<!DOCTYPE html>';
         $meta = '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
@@ -205,28 +178,29 @@ function export_page($edition, $title, $body, $stylesheet) {
         }
         $body = '<body class="' . $edition . '"><div class="page">' . $body . '</div>';
     }
-    return $head . '<html><head>' . $meta . '<title>' . $title . '</title></head>' . $body . $script . '</body></html>';
+    $config = export_config();
+    return $head . '<html lang="' . legacy_escape($config['language']) . '"><head>' . $meta . '<title>' . $title . '</title></head>' . $body . $script . '</body></html>';
 }
 
 function export_mast($edition, $site, $is_list, $sidebar = '') {
-    $notice = '本站为旧式浏览器设计。';
+    $notice = export_text('notice');
     if ($edition === 'early') {
-        $text = '<font color="#006699"><b>' . export_early_label(html_entity_decode($site['name'], ENT_QUOTES, 'UTF-8'), 40) . '</b></font>';
+        $text = '<font color="' . export_color('primary') . '"><b>' . export_early_label(html_entity_decode($site['name'], ENT_QUOTES, 'UTF-8'), 40) . '</b></font>';
         if ($is_list) {
             $text .= '<br>' . $site['description'] . '<br>' . $notice
-                . ' <a href="' . $site['url'] . '">返回主站</a>';
+                . ' <a href="' . $site['url'] . '">' . export_text('main_site') . '</a>';
         }
         return '<p>' . $text . '</p><hr>';
     }
     $toggle = ''; $menu = '';
     if ($edition === 'touch' && $sidebar !== '') {
-        $toggle = '<a class="touch-menu-toggle" id="touch-menu-toggle" href="#touch-index" aria-controls="touch-index" aria-expanded="false" aria-label="文章索引">'
-            . '<span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>索引</a>';
+        $toggle = '<a class="touch-menu-toggle" id="touch-menu-toggle" href="#touch-index" aria-controls="touch-index" aria-expanded="false" aria-label="' . export_text('open') . '" data-open-label="' . export_text('open') . '" data-close-label="' . export_text('close') . '">'
+            . '<span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>' . export_text('index') . '</a>';
         $menu = '<div class="touch-menu-layer" id="touch-menu-layer" style="display:none">'
             . '<div class="touch-menu-shade" id="touch-menu-shade" aria-hidden="true"></div>'
-            . '<div class="touch-menu" id="touch-index" role="navigation" aria-label="文章索引">'
-            . '<div class="touch-menu-head"><button type="button" class="touch-menu-close" id="touch-menu-close" aria-label="关闭文章索引">&#215;</button><h2>文章索引</h2></div>'
-            . '<div class="touch-menu-content"><a class="touch-home" href="index.html">首页<span>浏览全部文章 &#8250;</span></a>' . $sidebar . '</div></div></div>';
+            . '<div class="touch-menu" id="touch-index" role="navigation" aria-label="' . export_text('index_label') . '">'
+            . '<div class="touch-menu-head"><button type="button" class="touch-menu-close" id="touch-menu-close" aria-label="' . export_text('close') . '">&#215;</button><h2>' . export_text('index_label') . '</h2></div>'
+            . '<div class="touch-menu-content"><a class="touch-home" href="index.html">' . export_text('home') . '<span>' . export_text('browse_all') . ' &#8250;</span></a>' . $sidebar . '</div></div></div>';
         static $menu_script = null;
         if ($menu_script === null) { $menu_script = file_get_contents(__DIR__ . '/touch-menu.js'); }
         // Hide in the markup itself, and initialize before parsing the long article/media.
@@ -239,7 +213,7 @@ function export_mast($edition, $site, $is_list, $sidebar = '') {
     }
     $name = $edition === 'classic' ? '<a href="index.html">' . $site['name'] . '</a>' : $site['name'];
     return '<div class="mast">' . $toggle . '<h1>' . $name . '</h1><p>' . $site['description'] . '</p><p class="notice">'
-        . $notice . ' <a href="' . $site['url'] . '">返回主站</a></p></div>' . $menu;
+        . $notice . ' <a href="' . $site['url'] . '">' . export_text('main_site') . '</a></p></div>' . $menu;
 }
 
 function export_early_label($text, $columns = 48) {
@@ -261,10 +235,10 @@ function export_sidebar($posts, $per_page) {
         if ($i < 5) { $recent .= '<li>' . export_post_link($post) . '</li>'; }
         $year = substr($post->post_date, 0, 4);
         if (!isset($years[$year])) {
-            $years[$year] = '<li><a href="' . legacy_index_filename((int)floor($i / $per_page)) . '#post-' . (int)$post->ID . '">' . legacy_escape($year) . ' 年</a></li>';
+            $years[$year] = '<li><a href="' . legacy_index_filename((int)floor($i / $per_page)) . '#post-' . (int)$post->ID . '">' . export_text('year_label', array('year'=>$year)) . '</a></li>';
         }
     }
-    return '<div class="sidebar"><h2>近期文章</h2><ul>' . $recent . '</ul><h2>按年浏览</h2><ul>' . implode('', $years) . '</ul></div>';
+    return '<div class="sidebar"><h2>' . export_text('recent_posts') . '</h2><ul>' . $recent . '</ul><h2>' . export_text('by_year') . '</h2><ul>' . implode('', $years) . '</ul></div>';
 }
 
 function export_touch_index($posts, $per_page) {
@@ -283,10 +257,10 @@ function export_touch_index($posts, $per_page) {
     }
     $archive = '';
     foreach ($years as $year => $item) {
-        $archive .= '<li><a href="' . $item['href'] . '">' . legacy_escape((string)$year) . '<span>' . $item['count'] . ' 篇</span></a></li>';
+        $archive .= '<li><a href="' . $item['href'] . '">' . legacy_escape((string)$year) . '<span>' . export_text('post_count', array('count'=>$item['count'])) . '</span></a></li>';
     }
-    return '<h3>最近更新</h3><ul class="touch-recent">' . $recent . '</ul>'
-        . '<h3>按年浏览</h3><ul class="touch-years">' . $archive . '</ul>';
+    return '<h3>' . export_text('recent_updates') . '</h3><ul class="touch-recent">' . $recent . '</ul>'
+        . '<h3>' . export_text('by_year') . '</h3><ul class="touch-years">' . $archive . '</ul>';
 }
 
 function export_entry($post, $edition, $images, $summary) {

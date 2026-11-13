@@ -1,11 +1,13 @@
 <?php
 
-// Source encoding: GBK. Generated HTML encoding: GB2312.
+// Source encoding: GBK. Output charset is configured per edition.
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(403);
     exit("This exporter must be run from the command line.\n");
 }
+
+require_once __DIR__ . '/exporter/config.php';
 
 define('LEGACY_IMAGE_VSPACE', '6');
 
@@ -50,13 +52,7 @@ function legacy_normalize_dashes($text) {
 
 function legacy_write_html($path, $utf8_html) {
     $utf8_html = legacy_normalize_dashes($utf8_html);
-    $dash_marker = '__WP_LEGACY_GB2312_DASH__';
-    $utf8_html = str_replace("\xE2\x80\x94", $dash_marker, $utf8_html);
-    $encoded = iconv('UTF-8', 'GB2312//IGNORE', $utf8_html);
-    if ($encoded === false) {
-        throw new RuntimeException("Cannot encode output as GB2312: $path");
-    }
-    $encoded = str_replace($dash_marker, "\xA1\xAA", $encoded);
+    $encoded = export_encode_early($utf8_html, $path);
 
     if (@file_put_contents($path, $encoded) === false) {
         throw new RuntimeException("Cannot write output: $path");
@@ -722,11 +718,6 @@ function legacy_transform_content($content, $media, $song_font, $black_font) {
         . ' | .//object | .//embed | .//form | .//input | .//button'
         . ' | .//select | .//textarea'
     );
-    foreach ($xpath->query('.//a[@href]', $root) as $a) {
-        if (export_is_bilibili_link($a->getAttribute('href'))) {
-            $a->removeAttribute('href');
-        }
-    }
     legacy_transform_inline_semantics($dom, $xpath, $root);
     legacy_transform_figures($dom, $xpath, $root, $song_font);
     legacy_transform_headings($dom, $xpath, $root, $song_font, $black_font);
@@ -823,12 +814,13 @@ function legacy_print_usage() {
         . "  --wordpress-root=PATH  Directory containing wp-load.php\n"
         . "  --output=PATH          Output directory (default: legacy)\n"
         . "  --per-page=NUMBER      Posts per index page (default: 5)\n"
+        . "  --config=PATH          JSON colors, language and Early encoding\n"
         . "  --help                 Show this help\n";
 }
 
 function legacy_main() {
     $options = getopt('', array(
-        'wordpress-root:', 'output:', 'per-page:', 'help'
+        'wordpress-root:', 'output:', 'per-page:', 'config:', 'help'
     ));
     if ($options === false) {
         $options = array();
@@ -845,6 +837,7 @@ function legacy_main() {
         throw new RuntimeException('The PHP DOM extension is required.');
     }
 
+    export_load_config(isset($options['config']) ? legacy_resolve_path($options['config'], getcwd()) : null);
     $base_dir = dirname(__FILE__);
     $wp_load = legacy_find_wp_load($base_dir, $options);
     $output_dir = isset($options['output'])

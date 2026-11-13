@@ -5,6 +5,7 @@
     var layer = document.getElementById('touch-menu-layer'), shade = document.getElementById('touch-menu-shade');
     var close = document.getElementById('touch-menu-close'), root = document.documentElement;
     if (!toggle || !menu || !layer || !shade || !close) { return; }
+    var openLabel = toggle.getAttribute('data-open-label'), closeLabel = toggle.getAttribute('data-close-label');
     var opened = false, previousY = null;
     var oldViewport = /Android [12]\.|OS [1-4]_|Windows Phone (?:OS )?7\./.test(navigator.userAgent || '');
     function fit() {
@@ -20,7 +21,7 @@
         fit();
         layer.style.display = value ? 'block' : 'none';
         toggle.setAttribute('aria-expanded', value ? 'true' : 'false');
-        toggle.setAttribute('aria-label', value ? '收起文章索引' : '展开文章索引');
+        toggle.setAttribute('aria-label', value ? closeLabel : openLabel);
         if (keyboard) { (value ? close : toggle).focus(); }
     }
     function stop(event) { if (event.preventDefault) { event.preventDefault(); } event.returnValue = false; }
@@ -94,6 +95,6 @@
         window.onorientationchange = function () { if (typeof oldOrientation === 'function') { oldOrientation(); } fit(); };
     }
     layer.className = 'touch-menu-layer touch-menu-ready' + (oldViewport ? ' touch-menu-absolute' : '');
-    toggle.setAttribute('role', 'button'); toggle.setAttribute('aria-label', '展开文章索引');
+    toggle.setAttribute('role', 'button'); toggle.setAttribute('aria-label', openLabel);
     close.style.display = 'block';
 }());

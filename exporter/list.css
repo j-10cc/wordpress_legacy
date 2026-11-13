@@ -1,33 +1,33 @@
-body { margin:0; color:#333; background:#eff3ff; font:16px/1.6 Arial,"Microsoft YaHei",sans-serif; }
-.page { margin:0 auto; background:#fff; word-wrap:break-word; }
-.mast { padding:18px 22px; color:#fff; background:#006699; }
+body { margin:0; color:{{text}}; background:{{background}}; font:16px/1.6 Arial,"Microsoft YaHei",sans-serif; }
+.page { margin:0 auto; background:{{surface}}; word-wrap:break-word; }
+.mast { padding:18px 22px; color:{{on_primary}}; background:{{primary}}; }
 .mast h1 { margin:0; font:bold 32px Georgia,serif; }
 .mast p,.item p { margin:5px 0 0; }
-.item { margin:0 18px; padding:16px 0; border-bottom:1px solid #ddd; }
+.item { margin:0 18px; padding:16px 0; border-bottom:1px solid {{list_border}}; }
 .item h2 { margin:2px 0; font-size:21px; line-height:1.35; }
-.item a { color:#333; }
-small { color:#666; }
+.item a { color:{{link}}; }
+small { color:{{date}}; }
 .pagination { padding:16px; text-align:center; }
-.pagination a { color:#333; }
-.classic .page { width:94%; max-width:756px; margin:12px auto; border:1px solid #bcccd8; }
-.classic .mast { padding:18px 20px; border-bottom:4px solid #b8d5e4; }
+.pagination a { color:{{link}}; }
+.classic .page { width:94%; max-width:756px; margin:12px auto; border:1px solid {{frame_border}}; }
+.classic .mast { padding:18px 20px; border-bottom:4px solid {{header_border}}; }
 .classic .mast h1 { font-size:34px; }
-.classic .mast a { color:white; text-decoration:none; }
+.classic .mast a { color:{{on_primary}}; text-decoration:none; }
 .mast .notice { font-size:0.9em; }
-.mast .notice a { color:white; text-decoration:underline; }
+.mast .notice a { color:{{on_primary}}; text-decoration:underline; }
 .classic .columns { width:100%; table-layout:fixed; border-collapse:collapse; border-spacing:0; }
 .classic .posts { width:73%; padding:0; vertical-align:top; }
 .classic .sidebar-cell { width:27%; padding:0; vertical-align:top; }
 .classic .item { margin:0 16px; padding:18px 0; font-size:15px; overflow:hidden; }
 .classic .item h2 { font:bold 23px/1.25 Georgia,"SimSun",serif; }
-.classic .item h2 a { color:#064e71; text-decoration:none; }
+.classic .item h2 a { color:{{title_link}}; text-decoration:none; }
 .classic .item a:hover,.classic .mast a:hover { text-decoration:underline; }
 .classic .thumb { display:block; width:100%; height:auto; margin:9px 0; }
-.classic .sidebar { padding:17px 11px; border-left:1px solid #d6e1e8; background:#f4f7fb; font:13px/1.5 Tahoma,sans-serif; word-wrap:break-word; }
-.classic .sidebar h2 { margin:0; padding:0 0 4px; border-bottom:1px solid #c8d8e3; font-size:15px; color:#174a65; }
+.classic .sidebar { padding:17px 11px; border-left:1px solid {{sidebar_border}}; background:{{sidebar_background}}; font:13px/1.5 Tahoma,sans-serif; word-wrap:break-word; }
+.classic .sidebar h2 { margin:0; padding:0 0 4px; border-bottom:1px solid {{sidebar_heading_border}}; font-size:15px; color:{{sidebar_heading}}; }
 .classic .sidebar ul { margin:4px 0 20px; padding-left:16px; }
 .classic .sidebar li { margin:5px 0; }
-.classic .sidebar a { color:#245874; }
+.classic .sidebar a { color:{{sidebar_link}}; }
 .pocket { font:small/1.4 Tahoma,sans-serif; }
 .pocket .mast { padding:5px; }
 .pocket .mast h1 { font-size:1.5em; }
@@ -39,3 +39,4 @@ small { color:#666; }
 .touch .thumb { display:block; width:100%; max-width:480px; height:auto; margin:0 auto 8px; }
 .touch .item a { display:block; padding:4px 0; }
 .touch .pagination a { display:inline-block; padding:9px; }
+.item a:visited,.pagination a:visited,.classic .item h2 a:visited,.classic .sidebar a:visited { color:{{visited}}; }

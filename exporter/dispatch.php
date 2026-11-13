@@ -1,5 +1,7 @@
 <?php
 // This file is copied into the exported site. Serving pages does not load WordPress.
+// Replaced by the publisher to match the exported Early bytes and HTML META.
+define('LEGACY_EARLY_CHARSET', 'GB2312');
 function legacy_edition($ua) {
     $rules = json_decode(file_get_contents(__DIR__ . '/ua-rules.json'), true);
     foreach ($rules as $rule) {
@@ -23,7 +25,7 @@ function legacy_pocket_styles($html, $ua) {
 
 function legacy_dispatch() {
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    if (PHP_SAPI === 'cli-server' && preg_match('~^/(?:images/[\w.-]+\.(?:gif|png|jpg)|images/wp-[a-f0-9]{24}-touch_list-poster\.html|styles/(?:reader|list)\.css)$~D', $path)) {
+    if (PHP_SAPI === 'cli-server' && preg_match('~^/(?:images/[\w.-]+\.(?:gif|png|jpg)|styles/(?:reader|list)\.css)$~D', $path)) {
         return false; // PHP's development server serves these files directly.
     }
     if (PHP_SAPI === 'cli-server' && $path !== '/' && !preg_match('~^/[^/]+$~D', $path)) {
@@ -50,7 +52,7 @@ function legacy_dispatch() {
         ini_set('default_charset', '');
         header('Content-Type: text/html');
     } else {
-        header('Content-Type: text/html; charset=' . ($edition === 'early' ? 'GB2312' : 'UTF-8'));
+        header('Content-Type: text/html; charset=' . ($edition === 'early' ? LEGACY_EARLY_CHARSET : 'UTF-8'));
     }
     if ($edition === 'pocket') {
         $html = legacy_pocket_styles(file_get_contents($file), $ua);
